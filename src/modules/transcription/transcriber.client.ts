@@ -1,12 +1,9 @@
 import OpenAI from "openai";
-import { config } from "../config.js";
+import { config } from "../../core/config.js";
 
 const openai = new OpenAI({ apiKey: config.openaiApiKey });
 
-/**
- * Transcribes audio using OpenAI Whisper API.
- */
-export async function transcribe(
+export async function transcribeAudio(
   audioBuffer: Blob,
   mimeType: string,
 ): Promise<string> {
