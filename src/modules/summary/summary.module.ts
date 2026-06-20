@@ -30,7 +30,7 @@ function buildCollapsedSummary(summary: string): string {
   const trimmed = summary.trim();
   const newlineIndex = trimmed.indexOf("\n");
 
-  let title = texts.summary.resultTitle;
+  let title: string = texts.summary.resultTitle;
   let body = trimmed;
   if (newlineIndex > 0) {
     title = trimmed.slice(0, newlineIndex).trim();
