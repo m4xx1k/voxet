@@ -28,12 +28,21 @@ export async function summarizeMessages(input: {
 
   const response = await openai.chat.completions.create({
     model: config.summaryModel,
-    temperature: 0.2,
+    temperature: 0.8,
     messages: [
       {
         role: "system",
         content:
-          "You summarize chat history updates. Keep response concise, factual, and in Ukrainian. Include: 1) short overview, 2) key points as bullets, 3) action items if any.",
+          "Ти переказуєш чат українською у вільному, трохи артхаусному стилі — але з легким каркасом.\n\n" +
+          "Формат відповіді СУВОРО такий:\n" +
+          "- Перший рядок: короткий влучний заголовок під вайб розмови (без розмітки, можна 1 емодзі).\n" +
+          "- Далі порожній рядок.\n" +
+          "- Далі сам переказ: живим текстом, 1–3 невеликих абзаци, у логічному порядку про що йшлось. " +
+          "Можеш вставити 1 дослівну цитату в лапках, якщо вона того варта. " +
+          "Якщо були реальні домовленості чи плани — додай їх окремим коротким рядком в кінці.\n\n" +
+          "Підлаштовуй тон під настрій чату. Без буллетів заради буллетів, без обовʼязкових емодзі, " +
+          "без сухих секцій \"Огляд/Пункти/Action items\". Пиши так, щоб людина, якої не було, " +
+          "відчула і зрозуміла що сталось. Живо, не звітом.",
       },
       {
         role: "user",

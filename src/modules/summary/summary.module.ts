@@ -23,13 +23,23 @@ function escapeHtml(value: string): string {
 }
 
 function toHtmlQuote(value: string): string {
-  return escapeHtml(value).replaceAll("\n", "<br>");
+  return escapeHtml(value);
 }
 
 function buildCollapsedSummary(summary: string): string {
+  const trimmed = summary.trim();
+  const newlineIndex = trimmed.indexOf("\n");
+
+  let title = texts.summary.resultTitle;
+  let body = trimmed;
+  if (newlineIndex > 0) {
+    title = trimmed.slice(0, newlineIndex).trim();
+    body = trimmed.slice(newlineIndex + 1).trim();
+  }
+
   return (
-    `📌 <b>${escapeHtml(texts.summary.resultTitle)}</b>\n` +
-    `<blockquote expandable>${toHtmlQuote(summary)}</blockquote>`
+    `📌 <b>${escapeHtml(title)}</b>\n` +
+    `<blockquote expandable>${toHtmlQuote(body)}</blockquote>`
   );
 }
 
@@ -102,14 +112,8 @@ function extractStorableText(ctx: Context): string | null {
     return `[caption] ${caption}`;
   }
 
-  if (message.voice) {
-    return `[voice ${message.voice.duration}s]`;
-  }
-
-  if (message.video_note) {
-    return `[video_note ${message.video_note.duration}s]`;
-  }
-
+  // Голосові та кружечки в буфер кладе транскрипція (upsertTranscriptionSummaryMessage)
+  // реальним текстом — тут плейсхолдери не пишемо, щоб не плодити дублі.
   return null;
 }
 

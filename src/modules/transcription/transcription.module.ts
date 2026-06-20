@@ -22,7 +22,7 @@ function escapeHtml(value: string): string {
 }
 
 function toHtmlQuote(value: string): string {
-  return escapeHtml(value).replaceAll("\n", "<br>");
+  return escapeHtml(value);
 }
 
 function buildCollapsedTranscription(prefix: string, text: string): string {
