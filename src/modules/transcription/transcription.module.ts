@@ -22,12 +22,17 @@ function escapeHtml(value: string): string {
 }
 
 function toHtmlQuote(value: string): string {
-  return escapeHtml(value).replaceAll("\n", "<br>");
+  return escapeHtml(value);
 }
 
-function buildCollapsedTranscription(prefix: string, text: string): string {
+function buildCollapsedTranscription(
+  prefix: string,
+  author: string | undefined,
+  text: string,
+): string {
+  const who = author ? ` · ${escapeHtml(author)}` : "";
   return (
-    `${escapeHtml(prefix)} <b>${escapeHtml(texts.transcription.resultTitle)}</b>\n` +
+    `${escapeHtml(prefix)} <b>${escapeHtml(texts.transcription.resultTitle)}</b>${who}\n` +
     `<blockquote expandable>${toHtmlQuote(text)}</blockquote>`
   );
 }
@@ -37,16 +42,18 @@ async function editTranscriptionResult(
   chatId: number,
   messageId: number,
   text: string,
+  author?: string,
 ): Promise<void> {
   const prefix = pick(texts.transcription.successPrefixes);
-  const collapsedMessage = buildCollapsedTranscription(prefix, text);
+  const collapsedMessage = buildCollapsedTranscription(prefix, author, text);
 
   try {
     await ctx.api.editMessageText(chatId, messageId, collapsedMessage, {
       parse_mode: "HTML",
     });
   } catch {
-    await ctx.api.editMessageText(chatId, messageId, `${prefix} ${text}`);
+    const authorPlain = author ? `${author}: ` : "";
+    await ctx.api.editMessageText(chatId, messageId, `${prefix} ${authorPlain}${text}`);
   }
 }
 
@@ -113,7 +120,13 @@ async function handleVoiceMessage(
       userName: sourceUserName ?? (ctx.from?.username ? `@${ctx.from.username}` : "unknown"),
       text,
     });
-    await editTranscriptionResult(ctx, status.chat.id, status.message_id, text);
+    await editTranscriptionResult(
+      ctx,
+      status.chat.id,
+      status.message_id,
+      text,
+      sourceUserName,
+    );
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
